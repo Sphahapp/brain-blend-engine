@@ -90,10 +90,10 @@ export const AIFusionApp: React.FC = () => {
             </div>
             <Button
               variant={activeTab === 'settings' ? 'ai' : 'outline'}
-              onClick={() => setActiveTab('settings')}
+              onClick={() => setActiveTab(activeTab === 'settings' ? 'gemini' : 'settings')}
             >
               <Settings className="w-4 h-4 mr-2" />
-              Settings
+              {activeTab === 'settings' ? 'Back to App' : 'Settings'}
             </Button>
           </div>
         </div>
