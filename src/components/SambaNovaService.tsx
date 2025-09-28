@@ -41,7 +41,7 @@ export const SambaNovaService: React.FC<SambaNovaServiceProps> = ({ apiKey }) =>
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'Llama-3.2-11B-Vision-Instruct',
+          model: 'Llama-4-Maverick-17B-128E-Instruct',
           messages: [
             {
               role: 'user',

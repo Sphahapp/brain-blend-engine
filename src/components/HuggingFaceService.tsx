@@ -19,14 +19,16 @@ export const HuggingFaceService: React.FC<HuggingFaceServiceProps> = ({ apiKey }
 
     setLoading(true);
     try {
-      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/speecht5_tts', {
+      const response = await fetch('https://api-inference.huggingface.co/models/facebook/mms-tts-eng', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
+          'Accept': 'audio/wav',
         },
         body: JSON.stringify({
           inputs: text,
+          options: { wait_for_model: true }
         }),
       });
 
