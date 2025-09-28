@@ -6,6 +6,7 @@ import { GeminiService } from './GeminiService';
 import { HuggingFaceService } from './HuggingFaceService';
 import { SambaNovaService } from './SambaNovaService';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 interface APIKeys {
   gemini: string;
@@ -22,6 +23,7 @@ export const AIFusionApp: React.FC = () => {
     huggingface: '',
     sambanova: '',
   });
+  const { toast } = useToast();
 
   // Load API keys from localStorage on component mount
   useEffect(() => {
@@ -36,10 +38,20 @@ export const AIFusionApp: React.FC = () => {
   }, []);
 
   const handleSaveKeys = (keys: APIKeys) => {
-    setApiKeys(keys);
-    localStorage.setItem('ai-fusion-keys', JSON.stringify(keys));
-    // Show success message
-    console.log('API keys saved successfully!');
+    try {
+      setApiKeys(keys);
+      localStorage.setItem('ai-fusion-keys', JSON.stringify(keys));
+      toast({
+        title: "Success!",
+        description: "API keys saved successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save API keys",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderContent = () => {
