@@ -27,11 +27,51 @@ export const SambaNovaService: React.FC<SambaNovaServiceProps> = ({ apiKey }) =>
 
     setLoading(true);
     try {
-      // This would normally call your backend proxy
-      // For now, we'll simulate the response
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setResponse(`Analysis of "${selectedFile.name}":\n\nQuestion: ${question}\n\nThis is a simulated response. In the full implementation, this would analyze the uploaded image using SambaNova's vision models through your backend proxy server.`);
+      // Convert image to base64
+      const base64Image = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(selectedFile);
+      });
+
+      const response = await fetch('https://api.sambanova.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'Llama-3.2-11B-Vision-Instruct',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: question
+                },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: base64Image
+                  }
+                }
+              ]
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 1000
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setResponse(data.choices[0]?.message?.content || 'No response received');
     } catch (error) {
+      console.error('Error analyzing image:', error);
       setResponse('Error analyzing image. Please check your API key and try again.');
     } finally {
       setLoading(false);

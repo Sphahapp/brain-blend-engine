@@ -19,12 +19,27 @@ export const HuggingFaceService: React.FC<HuggingFaceServiceProps> = ({ apiKey }
 
     setLoading(true);
     try {
-      // This would normally call your backend proxy
-      // For now, we'll simulate the response
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setAudioUrl('https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'); // Placeholder audio
+      const response = await fetch('https://api-inference.huggingface.co/models/microsoft/speecht5_tts', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          inputs: text,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const audioBlob = await response.blob();
+      const audioUrl = URL.createObjectURL(audioBlob);
+      setAudioUrl(audioUrl);
     } catch (error) {
       console.error('Error generating speech:', error);
+      setAudioUrl('');
     } finally {
       setLoading(false);
     }
@@ -75,7 +90,7 @@ export const HuggingFaceService: React.FC<HuggingFaceServiceProps> = ({ apiKey }
                 Your browser does not support the audio element.
               </audio>
               <p className="text-sm text-muted-foreground mt-2">
-                Audio generated successfully! (This is a placeholder - real implementation would generate actual speech)
+                Generated from: "{text}"
               </p>
             </div>
           </CardContent>
